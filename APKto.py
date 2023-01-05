@@ -1,52 +1,99 @@
 import os
 import xml.etree.ElementTree as ET
 from keyboard import press
-
+from xml.dom import minidom  # mini Document Object Model for XML
 
 apks = os.listdir("apk")
 # Extract the AndroidManifest.xml file using apktool
 for i in apks:
-    os.system(f"apktool d apk/{i} -o C:/Users/Segev/PycharmProjects/StackDroid/StackDroid/extracted_apk/{i[:-4]}")
-    press('enter')
-    # Open the AndroidManifest.xml file
-    with open(f"C:/Users/Segev/PycharmProjects/StackDroid/StackDroid/extracted_apk/{i[:-4]}/AndroidManifest.xml", "r") as f:
-        # Read the contents of the file
-        try:
-            manifest_xml = f.read()
-        except:
-            continue
-
-        # print(manifest_xml)
-    # Parse the XML data
-    root = ET.fromstring(manifest_xml)
+    filename = i[:-4]
+    # os.system(f"apktool d apk/{i} -o C:/Users/Segev/PycharmProjects/StackDroid/StackDroid/extracted_apk/{filename}")
+    # press('enter')
 
     # Initialize lists to store the extracted information
-    permissions = []
-    api_calls = []
-    activities = []
+    RequestedPermissionSet = set()
+    ActivitySet = set()
+    ServiceSet = set()
+    ContentProviderSet = set()
+    BroadcastReceiverSet = set()
+    HardwareComponentsSet = set()
+    IntentFilterSet = set()
 
-    # Extract the permissions, API calls, and activities from the AndroidManifest.xml file
-    for child in root:
-        # Extract the permissions
-        if child.tag == 'uses-permission':
-            permissions.append(child.attrib['{http://schemas.android.com/apk/res/android}name'])
-        for c in child:
-            if c.tag == 'uses-library':
-                api_calls.append(c.attrib['{http://schemas.android.com/apk/res/android}name'])
-            # Extract the activities
-            if c.tag == 'activity' and '{http://schemas.android.com/apk/res/android}name' in c.attrib:
-                activities.append(c.attrib['{http://schemas.android.com/apk/res/android}name'][1:])
+    try:
+        f = open(f'extracted_apk/{filename}/AndroidManifest.xml', "r")
+        Dom = minidom.parse(f)
+        DomCollection = Dom.documentElement
+
+        DomPermission = DomCollection.getElementsByTagName("uses-permission")
+        for Permission in DomPermission:
+            if Permission.hasAttribute("android:name"):
+                RequestedPermissionSet.add(Permission.getAttribute("android:name"))
+
+        DomActivity = DomCollection.getElementsByTagName("activity")
+        for Activity in DomActivity:
+            if Activity.hasAttribute("android:name"):
+                ActivitySet.add(Activity.getAttribute("android:name"))
+
+        DomService = DomCollection.getElementsByTagName("service")
+        for Service in DomService:
+            if Service.hasAttribute("android:name"):
+                ServiceSet.add(Service.getAttribute("android:name"))
+
+        DomContentProvider = DomCollection.getElementsByTagName("provider")
+        for Provider in DomContentProvider:
+            if Provider.hasAttribute("android:name"):
+                ContentProviderSet.add(Provider.getAttribute("android:name"))
+
+        DomBroadcastReceiver = DomCollection.getElementsByTagName("receiver")
+        for Receiver in DomBroadcastReceiver:
+            if Receiver.hasAttribute("android:name"):
+                BroadcastReceiverSet.add(Receiver.getAttribute("android:name"))
+
+        DomHardwareComponent = DomCollection.getElementsByTagName("uses-feature")
+        for HardwareComponent in DomHardwareComponent:
+            if HardwareComponent.hasAttribute("android:name"):
+                HardwareComponentsSet.add(HardwareComponent.getAttribute("android:name"))
+
+        DomIntentFilter = DomCollection.getElementsByTagName("intent-filter")
+        DomIntentFilterAction = DomCollection.getElementsByTagName("action")
+        for Action in DomIntentFilterAction:
+            if Action.hasAttribute("android:name"):
+                IntentFilterSet.add(Action.getAttribute("android:name"))
+
+
+    except Exception as e:
+        print(e)
+        continue
+    finally:
+        f.close()
+
 
     # Open a new file for writing
     with open(f"ben/{i[:-4]}", "w") as f:
         # Write the permissions to the file
-        for permission in permissions:
+        for permission in RequestedPermissionSet:
             f.write(f"permission::{permission}\n")
 
-        # Write the API calls to the file
-        for api_call in api_calls:
-            f.write(f"api_call::{api_call}\n")
+        # Write the service to the file
+        for service in ServiceSet:
+            f.write(f"service::{service}\n")
 
         # Write the activities to the file
-        for activity in activities:
-            f.write(f"activity::{activity}\n")
+        for activity in ActivitySet:
+            f.write(f"activity::{activity[1:]}\n")
+
+        # Write the Intent to the file
+        for intent in IntentFilterSet:
+            f.write(f"intent::{intent}\n")
+
+        # Write the feature to the file
+        for feature in HardwareComponentsSet:
+            f.write(f"feature::{feature}\n")
+
+        # Write the provider to the file
+        for provider in ContentProviderSet:
+            f.write(f"provider::{provider}\n")
+
+        # Write the receiver to the file
+        for receiver in BroadcastReceiverSet:
+            f.write(f"receiver::{receiver[1:]}\n")
