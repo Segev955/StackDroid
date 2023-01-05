@@ -15,7 +15,8 @@ def rnd_mal_ben():
         return "mal"
     return "ben"
 
-def makeCsv(l,folder,csvname):
+def makeCsv(csvname, folder = dest_folder):
+    l=createList()
     f = open(f'{folder}/{csvname}', 'w',newline='')
     writer = csv.writer(f)
     print(l)
@@ -23,7 +24,7 @@ def makeCsv(l,folder,csvname):
     print(writer)
     f.close()
 
-def csvnames(csvname):
+def createList():
     l = []
     datamal= [x for x in os.listdir("mal")]
     databen = [x for x in os.listdir("ben")]
@@ -31,11 +32,9 @@ def csvnames(csvname):
         l.append([x,1])
     for x in databen:
         l.append([x,0])
-
-    makeCsv(l,dest_folder,csvname)
+    return l
 
 
 if __name__ == '__main__':
-
-    csvnames('sha256_family.csv')
+    makeCsv('sha256_family.csv')
     print(f"csvsaved.")
