@@ -37,5 +37,5 @@ def csvnames(csvname):
 
 if __name__ == '__main__':
 
-    csvnames('malben.csv')
+    csvnames('sha256_family.csv')
     print(f"csvsaved.")
