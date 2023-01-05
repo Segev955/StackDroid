@@ -25,16 +25,17 @@ def makeCsv(l,folder,csvname):
 
 def csvnames(csvname):
     l = []
-    l.append(['sha256','family'])
-    data= [x for x in os.listdir("drebin/feature_vectors")]
-    print(data)
-    for x in data:
-        l.append([x,'Plankton'])
+    datamal= [x for x in os.listdir("mal")]
+    databen = [x for x in os.listdir("ben")]
+    for x in datamal:
+        l.append([x,1])
+    for x in databen:
+        l.append([x,0])
 
     makeCsv(l,dest_folder,csvname)
 
 
 if __name__ == '__main__':
 
-    csvnames('sha256_family.csv')
+    csvnames('malben.csv')
     print(f"csvsaved.")
