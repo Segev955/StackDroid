@@ -5,7 +5,7 @@ import random
 import sys
 import hashlib
 # Define folder where the log files are located
-source_folder = 'drebin/samples/'
+source_folder = 'sha'
 dest_folder = 'drebin'
 
 # List of all the files
@@ -25,6 +25,7 @@ def makeCsv(l,folder,csvname):
 
 def csvnames(csvname):
     l = []
+    l.append("")
     datamal= [x for x in os.listdir("mal")]
     databen = [x for x in os.listdir("ben")]
     for x in datamal:
@@ -37,5 +38,5 @@ def csvnames(csvname):
 
 if __name__ == '__main__':
 
-    csvnames('malben.csv')
+    csvnames('sha256_family.csv')
     print(f"csvsaved.")

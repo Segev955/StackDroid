@@ -1,15 +1,22 @@
 import os
 import xml.etree.ElementTree as ET
+from keyboard import press
+
 
 apks = os.listdir("apk")
 # Extract the AndroidManifest.xml file using apktool
 for i in apks:
     os.system(f"apktool d apk/{i} -o C:/Users/Segev/PycharmProjects/StackDroid/StackDroid/extracted_apk/{i[:-4]}")
-# Open the AndroidManifest.xml file
+    press('enter')
+    # Open the AndroidManifest.xml file
     with open(f"C:/Users/Segev/PycharmProjects/StackDroid/StackDroid/extracted_apk/{i[:-4]}/AndroidManifest.xml", "r") as f:
         # Read the contents of the file
-        manifest_xml = f.read()
-        print(manifest_xml)
+        try:
+            manifest_xml = f.read()
+        except:
+            continue
+
+        # print(manifest_xml)
     # Parse the XML data
     root = ET.fromstring(manifest_xml)
 
@@ -24,10 +31,6 @@ for i in apks:
         if child.tag == 'uses-permission':
             permissions.append(child.attrib['{http://schemas.android.com/apk/res/android}name'])
         for c in child:
-            print("_______________________")
-            print(c.tag)
-            # Extract the API calls
-
             if c.tag == 'uses-library':
                 api_calls.append(c.attrib['{http://schemas.android.com/apk/res/android}name'])
             # Extract the activities
@@ -35,7 +38,7 @@ for i in apks:
                 activities.append(c.attrib['{http://schemas.android.com/apk/res/android}name'][1:])
 
     # Open a new file for writing
-    with open(i[:-4], "w") as f:
+    with open(f"ben/{i[:-4]}", "w") as f:
         # Write the permissions to the file
         for permission in permissions:
             f.write(f"permission::{permission}\n")
