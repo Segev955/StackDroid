@@ -26,7 +26,7 @@ def makeCsv(csvname, folder = dest_folder):
 
 def createList():
     l = []
-    l.appand(['apps' , 'family'])
+    l.append(['apps', 'family'])
     datamal= [x for x in os.listdir("mal")]
     databen = [x for x in os.listdir("ben")]
     for x in datamal:
