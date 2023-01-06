@@ -19,8 +19,7 @@ apks = os.listdir("F:/droid/ben/0/train")
 
 for i in apks:
     filename = i[:-4]
-    os.system(f"apktool d {apks}/{i} -o apk/{filename}")
-    time.sleep(10)
+    os.system(f"apktool d F:/droid/ben/0/train/{i} -o apk/{filename}")
     press('enter')
 
     # Initialize lists to store the extracted information
@@ -83,7 +82,7 @@ for i in apks:
         continue
 
     try:
-        os.system(f"apktool d -f -r -s {apks}/{i} -o apk/{filename}")
+        os.system(f"apktool d -f -r -s F:/droid/ben/0/train/{i} -o apk/{filename}")
         dex = DEXParser(filedir=f"apk\{filename}\classes.dex")
         for s in dex.get_strings():
             print("//////////////////////")
