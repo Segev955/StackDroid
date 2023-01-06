@@ -1,21 +1,24 @@
 import sys
-reload(sys)
+
+# reload(sys)
 sys.setdefaultencoding("utf-8")
 
 import os
 import time
+
 sys.path.append("Modules")
 sys.path.append("Androguard")
 import re
 import multiprocessing as mp
 
 import CommonModules as CM
-from CommonModules import logger
+# from CommonModules import logger
 import androlyze
 import BasicBlockAttrBuilder as BasicBlockAttrBuilder
 import PScoutMapping as PScoutMapping
 
-from xml.dom import minidom #mini Document Object Model for XML
+from xml.dom import minidom  # mini Document Object Model for XML
+
 
 def GetFromXML(ApkDirectoryPath, ApkFile):
     '''
@@ -54,7 +57,7 @@ def GetFromXML(ApkDirectoryPath, ApkFile):
         f.write((a.xml["AndroidManifest.xml"].toprettyxml()).encode("utf-8"))
         f.close()
     except Exception as e:
-        print e
+        print(e)
         logger.error(e)
         logger.error("Executing Androlyze on " + ApkFile + " to get AndroidManifest.xml Failed.")
         return
@@ -135,7 +138,7 @@ def GetFromInstructions(ApkDirectoryPath, ApkFile, PMap, RequestedPermissionList
         ApkFile = os.path.abspath(ApkFile)
         a, d, dx = androlyze.AnalyzeAPK(ApkFile)
     except Exception as e:
-        print e
+        print(e)
         logger.error(e)
         logger.error("Executing Androlyze on " + ApkFile + " Failed.")
         return
@@ -174,7 +177,7 @@ def ProcessingDataForGetApkData(ApkDirectoryPath, ApkFile, PMap):
         logger.info("Start to process " + ApkFile + "...")
         print("Start to process " + ApkFile + "...")
         DataDictionary = {}
-        RequestedPermissionSet, ActivitySet, ServiceSet, ContentProviderSet, BroadcastReceiverSet, HardwareComponentsSet,\
+        RequestedPermissionSet, ActivitySet, ServiceSet, ContentProviderSet, BroadcastReceiverSet, HardwareComponentsSet, \
         IntentFilterSet = GetFromXML(ApkDirectoryPath, ApkFile)
         RequestedPermissionList = list(RequestedPermissionSet)
         ActivityList = list(ActivitySet)
@@ -205,7 +208,6 @@ def ProcessingDataForGetApkData(ApkDirectoryPath, ApkFile, PMap):
         DataDictionary["URLDomainList"] = URLDomainList
         # Set S6, S5, S7, S8
 
-
         CM.ExportToJson(os.path.splitext(ApkFile)[0] + ".data", DataDictionary)
 
 
@@ -213,12 +215,14 @@ def ProcessingDataForGetApkData(ApkDirectoryPath, ApkFile, PMap):
         FinalTime = time.time()
         logger.error(e)
         logger.error(ApkFile + " processing failed in " + str(FinalTime - StartTime) + "s...")
-        print ApkFile + " processing failed in " + str(FinalTime - StartTime) + "s..."
+        print
+        ApkFile + " processing failed in " + str(FinalTime - StartTime) + "s..."
         return ApkFile, False
     else:
         FinalTime = time.time()
         logger.info(ApkFile + " processed successfully in " + str(FinalTime - StartTime) + "s")
-        print ApkFile + " processed successfully in " + str(FinalTime - StartTime) + "s"
+        print
+        ApkFile + " processed successfully in " + str(FinalTime - StartTime) + "s"
         return ApkFile, True
 
 

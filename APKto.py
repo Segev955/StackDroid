@@ -1,19 +1,26 @@
 import os
 import re
 import shutil
+import time
 import xml.etree.ElementTree as ET
+import re
+from androguard.misc import AnalyzeAPK
+from androguard.cli import androlyze_main
 
-import chardet as chardet
 from keyboard import press
 from xml.dom import minidom  # mini Document Object Model for XML
+import BasicBlockAttrBuilder as BasicBlockAttrBuilder
+import PScoutMapping as PScoutMapping
+import multiprocessing as mp
 from dexparser import DEXParser
 
-apks = os.listdir("apk")
+apks = os.listdir("F:/droid/ben/0/train")
 # Extract the AndroidManifest.xml file using apktool
 
 for i in apks:
     filename = i[:-4]
-    os.system(f"apktool d apk/{i} -o apk/{filename}")
+    os.system(f"apktool d F:/droid/ben/0/train/{i} -o apk/{filename}")
+    time.sleep(10)
     press('enter')
 
     # Initialize lists to store the extracted information
@@ -76,11 +83,10 @@ for i in apks:
         continue
 
     try:
-        os.system(f"apktool d -f -r -s apk/{i} -o apk/{filename}")
+        os.system(f"apktool d -f -r -s F:/droid/ben/0/train/{i} -o apk/{filename}")
         dex = DEXParser(filedir=f"apk\{filename}\classes.dex")
         for s in dex.get_strings():
             print("//////////////////////")
-            print(s)
             for encoding in ["utf-8", "latin-1", "utf-16"]:
                 try:
                     # Decode the bytes object to a string using the current encoding
@@ -91,7 +97,7 @@ for i in apks:
                     # If the current encoding is not supported, skip to the next one
                     continue
 
-        shutil.rmtree(f'apk/{filename}')
+        # shutil.rmtree(f'apk/{filename}')
 
     except Exception as e:
         print(e)
@@ -99,7 +105,7 @@ for i in apks:
 
 
     # Open a new file for writing
-    with open(f"ben/{i[:-4]}", "w") as f:
+    with open(f"drebin/ben/{filename}", "w") as f:
         # Write the permissions to the file
         for permission in RequestedPermissionSet:
             f.write(f"permission::{permission}\n")
