@@ -1,14 +1,20 @@
 import os
+import re
+import shutil
 import xml.etree.ElementTree as ET
+
+import chardet as chardet
 from keyboard import press
 from xml.dom import minidom  # mini Document Object Model for XML
+from dexparser import DEXParser
 
 apks = os.listdir("apk")
 # Extract the AndroidManifest.xml file using apktool
+
 for i in apks:
     filename = i[:-4]
-    # os.system(f"apktool d apk/{i} -o C:/Users/Segev/PycharmProjects/StackDroid/StackDroid/extracted_apk/{filename}")
-    # press('enter')
+    os.system(f"apktool d apk/{i} -o apk/{filename}")
+    press('enter')
 
     # Initialize lists to store the extracted information
     RequestedPermissionSet = set()
@@ -18,9 +24,10 @@ for i in apks:
     BroadcastReceiverSet = set()
     HardwareComponentsSet = set()
     IntentFilterSet = set()
+    URLSet = set()
 
     try:
-        f = open(f'extracted_apk/{filename}/AndroidManifest.xml', "r")
+        f = open(f'apk/{filename}/AndroidManifest.xml', "r")
         Dom = minidom.parse(f)
         DomCollection = Dom.documentElement
 
@@ -60,12 +67,35 @@ for i in apks:
             if Action.hasAttribute("android:name"):
                 IntentFilterSet.add(Action.getAttribute("android:name"))
 
+        f.close()
+        shutil.rmtree(f'apk/{filename}')
+
 
     except Exception as e:
         print(e)
         continue
-    finally:
-        f.close()
+
+    try:
+        os.system(f"apktool d -f -r -s apk/{i} -o apk/{filename}")
+        dex = DEXParser(filedir=f"apk\{filename}\classes.dex")
+        for s in dex.get_strings():
+            print("//////////////////////")
+            print(s)
+            for encoding in ["utf-8", "latin-1", "utf-16"]:
+                try:
+                    # Decode the bytes object to a string using the current encoding
+                    ss = s.decode(encoding)
+                    if "http://" in ss:
+                        URLSet.add(ss)
+                except UnicodeDecodeError:
+                    # If the current encoding is not supported, skip to the next one
+                    continue
+
+        shutil.rmtree(f'apk/{filename}')
+
+    except Exception as e:
+        print(e)
+        continue
 
 
     # Open a new file for writing
@@ -97,3 +127,8 @@ for i in apks:
         # Write the receiver to the file
         for receiver in BroadcastReceiverSet:
             f.write(f"receiver::{receiver[1:]}\n")
+
+        # Write the URL to the file
+        for url in URLSet:
+            f.write(f"url::{url}\n")
+        print("Saved")
