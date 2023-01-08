@@ -9,17 +9,21 @@ from androguard.cli import androlyze_main
 
 from keyboard import press
 from xml.dom import minidom  # mini Document Object Model for XML
-import BasicBlockAttrBuilder as BasicBlockAttrBuilder
-import PScoutMapping as PScoutMapping
+# import BasicBlockAttrBuilder as BasicBlockAttrBuilder
+# import PScoutMapping as PScoutMapping
 import multiprocessing as mp
 from dexparser import DEXParser
 
-apks = os.listdir("F:/droid/ben/0/train")
+apks = os.listdir("F:\droid\drebin")
 # Extract the AndroidManifest.xml file using apktool
+l = len(apks)
+c = 0
+x = "app0"
 
 for i in apks:
+    f'-------------------- {c}/{l} --------------------'
     filename = i[:-4]
-    os.system(f"apktool d F:/droid/ben/0/train/{i} -o apk/{filename}")
+    os.system(f"apktool d F:/droid/drebin/{i} -o apk/{filename}")
     press('enter')
 
     # Initialize lists to store the extracted information
@@ -82,10 +86,9 @@ for i in apks:
         continue
 
     try:
-        os.system(f"apktool d -f -r -s F:/droid/ben/0/train/{i} -o apk/{filename}")
+        os.system(f"apktool d -f -r -s F:/droid/drebin/{i} -o apk/{filename}")
         dex = DEXParser(filedir=f"apk\{filename}\classes.dex")
         for s in dex.get_strings():
-            print("//////////////////////")
             for encoding in ["utf-8", "latin-1", "utf-16"]:
                 try:
                     # Decode the bytes object to a string using the current encoding
@@ -96,44 +99,55 @@ for i in apks:
                     # If the current encoding is not supported, skip to the next one
                     continue
 
-        # shutil.rmtree(f'apk/{filename}')
+        shutil.rmtree(f'apk/{x}')
+        x = filename
+    except Exception as e:
+        print(e)
+        continue
+
+    try:
+
+        # Open a new file for writing
+        with open(f"drebin/mal/{filename}", "w") as f:
+            # Write the permissions to the file
+            for permission in RequestedPermissionSet:
+                f.write(f"permission::{permission}\n")
+
+            # Write the service to the file
+            for service in ServiceSet:
+                f.write(f"service::{service}\n")
+
+            # Write the activities to the file
+            for activity in ActivitySet:
+                f.write(f"activity::{activity[1:]}\n")
+
+            # Write the Intent to the file
+            for intent in IntentFilterSet:
+                f.write(f"intent::{intent}\n")
+
+            # Write the feature to the file
+            for feature in HardwareComponentsSet:
+                f.write(f"feature::{feature}\n")
+
+            # Write the provider to the file
+            for provider in ContentProviderSet:
+                f.write(f"provider::{provider}\n")
+
+            # Write the receiver to the file
+            for receiver in BroadcastReceiverSet:
+                f.write(f"receiver::{receiver[1:]}\n")
+
+            # Write the URL to the file
+            for url in URLSet:
+                f.write(f"url::{url}\n")
+            print("Saved")
+            c+=1
 
     except Exception as e:
         print(e)
         continue
 
 
-    # Open a new file for writing
-    with open(f"drebin/ben/{filename}", "w") as f:
-        # Write the permissions to the file
-        for permission in RequestedPermissionSet:
-            f.write(f"permission::{permission}\n")
 
-        # Write the service to the file
-        for service in ServiceSet:
-            f.write(f"service::{service}\n")
 
-        # Write the activities to the file
-        for activity in ActivitySet:
-            f.write(f"activity::{activity[1:]}\n")
 
-        # Write the Intent to the file
-        for intent in IntentFilterSet:
-            f.write(f"intent::{intent}\n")
-
-        # Write the feature to the file
-        for feature in HardwareComponentsSet:
-            f.write(f"feature::{feature}\n")
-
-        # Write the provider to the file
-        for provider in ContentProviderSet:
-            f.write(f"provider::{provider}\n")
-
-        # Write the receiver to the file
-        for receiver in BroadcastReceiverSet:
-            f.write(f"receiver::{receiver[1:]}\n")
-
-        # Write the URL to the file
-        for url in URLSet:
-            f.write(f"url::{url}\n")
-        print("Saved")
