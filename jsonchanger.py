@@ -1,4 +1,5 @@
 import json
+from random import random
 
 
 def loud_from_json(filename):
@@ -10,7 +11,7 @@ def save_to_json(filename, l):
     with open(filename, 'w') as outfile:
         json.dump(l, outfile)
 
-def change_numbers(dict):
+def replace_numbers(dict):
     l=[]
     for n in dict:
         if n ==0:
@@ -21,16 +22,25 @@ def change_numbers(dict):
             l.append(n)
     return l
 
-def run(filename):
-    save_to_json(filename, change_numbers(loud_from_json(filename)))
+def random_numbers(dict):
+    l = []
+    for n in dict:
+        l.append(int(random()*2))
+    return l
 
-def run_to_other_file(src, dest):
-    save_to_json(dest, change_numbers(loud_from_json(src)))
+def run_replace(filename):
+    save_to_json(filename, replace_numbers(loud_from_json(filename)))
+
+def run_replace_to_other_file(src, dest):
+    save_to_json(dest, replace_numbers(loud_from_json(src)))
+
+def run_random(filename):
+    save_to_json(filename, random_numbers(loud_from_json(filename)))
+
+def run_random_to_other_file(src, dest):
+    save_to_json(dest, random_numbers(loud_from_json(src)))
 
 if __name__ == '__main__':
     filename = 'y_test.json'
-    run(filename)
-    with open(filename, 'r') as f:
-        aa = json.load(f)
-    print(aa)
+    run_random(filename)
 
